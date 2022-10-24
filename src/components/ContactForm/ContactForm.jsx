@@ -1,9 +1,30 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from "react-redux";
+import { contactsSelector } from '../../redux/selectors';
+import { addContact } from '../../redux/slices/contactsSlice';
+
 import css from './ContactForm.module.css'
 
-export const ContactForm = ({ addName }) => {
+export const ContactForm = () => {
+
+    const contactsStore = useSelector(contactsSelector);
+    const dispatch = useDispatch();
+
+    const handleAddName = event => {
+        event.preventDefault();
+
+        const { value: name } = event.target.elements.name;
+        const { value: number } = event.target.elements.number;
+
+        if (contactsStore.map(contact => contact.name).includes(name)) {
+            alert(`${name} is already in contacts`);
+            return;
+        }
+        dispatch(addContact(name, number));
+        event.target.reset();
+    }
+
     return (
-        <form className={css.form} onSubmit={addName} >
+        <form className={css.form} onSubmit={handleAddName} >
 
             <label className={css.label} htmlFor="name" >Name</label>
             <input className={css.input} id="name" type="text" name="name" pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$" placeholder="Enter name"
@@ -18,8 +39,3 @@ export const ContactForm = ({ addName }) => {
         </form>
     )
 }
-
-ContactForm.protoTypes = {
-    addName: PropTypes.func,
-    nameInputId: PropTypes.func,
-};

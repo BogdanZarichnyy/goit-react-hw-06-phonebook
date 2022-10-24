@@ -1,31 +1,34 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from "react-redux";
+import { contactsSelector, filterSelector } from '../../redux/selectors';
+import { deleteContact } from '../../redux/slices/contactsSlice';
+
 import css from './ContactList.module.css'
 
-export const ContactList = ({ contacts, findName, deleteName }) => {
+export const ContactList = () => {
+
+    const contactsStore = useSelector(contactsSelector);
+    const findName = useSelector(filterSelector);
+    const dispatch = useDispatch();
+
+    const handleDeleteName = (id) => {
+        dispatch(deleteContact(id));
+    }
+
     return (
         <ul className={css.list}>
-            {findName === '' ?
-                contacts.map(contact => (
+            {!findName ?
+                contactsStore.map(contact => (
                     <li key={contact.id}>{contact.name}: {contact.number}
-                        <button className={css.btndel} onClick={() => deleteName(contact.id)} type="button">delete</button>
+                        <button className={css.btndel} onClick={() => handleDeleteName(contact.id)} type="button">delete</button>
                     </li>
                 )) :
-                contacts.filter(contact => (contact.name.toLowerCase().includes(findName))).map(contact => (
+                contactsStore.filter(contact => (contact.name.toLowerCase().includes(findName)))
+                    .map(contact => (
                     <li key={contact.id}>{contact.name}: {contact.number}
-                        <button className={css.btndel} onClick={() => deleteName(contact.id)} type="button">delete</button>
+                        <button className={css.btndel} onClick={() => handleDeleteName(contact.id)} type="button">delete</button>
                     </li>
                 ))
             }
         </ul>
     )
 }
-
-ContactList.protoTypes = {
-    contacts: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        name: PropTypes.string,
-        number: PropTypes.string,
-    })),
-    filter: PropTypes.string,
-    deleteName: PropTypes.func,
-};
